@@ -1,0 +1,5 @@
+{
+  "name": "Live Sports Stream no img",
+  "description": "A web application to watch live sports streams with an updated schedule. Select a match and choose a server to start watching.",
+  "requestFramePermissions": []
+}
