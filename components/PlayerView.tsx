@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import type { Match } from '../types';
 
@@ -19,7 +18,7 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack }) => {
   if (!match) return null;
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in max-w-3xl mx-auto">
       <button
         onClick={onBack}
         className="mb-4 inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-lg"
