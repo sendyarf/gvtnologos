@@ -52,7 +52,7 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
 
   const itemClasses = `group bg-surface rounded-xl p-4 transition-all duration-300 shadow-md flex items-center gap-4 ${
     isLive
-      ? 'cursor-pointer hover:bg-surface-hover hover:shadow-xl hover:-translate-y-1 border-l-4 border-warning'
+      ? 'cursor-pointer hover:bg-surface-hover hover:shadow-xl hover:-translate-y-1 border-l-4 border-accent2'
       : 'cursor-not-allowed opacity-60 border-l-4 border-transparent'
   }`;
 
@@ -66,7 +66,7 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
       <div className="flex flex-col items-center justify-center w-20 text-center">
         {isLive ? (
           <div className="flex flex-col items-center gap-1">
-            <span className="bg-warning text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-2 shadow-md shadow-warning/30">
+            <span className="bg-accent2 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-2 shadow-md shadow-accent2/30">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
@@ -89,7 +89,7 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
           <span className="text-secondary font-mono text-xs mx-3">VS</span>
           <p className="flex-1 text-base md:text-lg font-bold text-primary text-left truncate">{match.team2.name}</p>
         </div>
-        <p className="text-sm text-center font-semibold text-accent2 mt-1 truncate">{match.league}</p>
+        <p className="text-sm text-center font-semibold text-secondary mt-1 truncate">{match.league}</p>
       </div>
 
       {/* Watch Icon Column */}
