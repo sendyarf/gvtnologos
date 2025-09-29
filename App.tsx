@@ -34,24 +34,41 @@ const DonateIcon = () => (
 );
 
 const getMatchStatus = (match: Match): 'live' | 'upcoming' | 'past' => {
+  // Manual override from data source
   if (
-    match.kickoff_date === 'live' ||
-    match.match_date === 'live' ||
-    match.kickoff_time === 'live' ||
-    match.match_time === 'live' ||
-    match.duration === 'live'
+    ['live', 'Live', 'LIVE'].includes(match.kickoff_date) ||
+    ['live', 'Live', 'LIVE'].includes(match.match_date) ||
+    ['live', 'Live', 'LIVE'].includes(match.kickoff_time) ||
+    ['live', 'Live', 'LIVE'].includes(match.match_time) ||
+    ['live', 'Live', 'LIVE'].includes(match.duration)
   ) {
     return 'live';
   }
 
   const now = new Date();
-  // By appending '+07:00', we specify the time is in Jakarta time (WIB/UTC+7).
-  // The Date object will correctly represent this point in time, regardless of user's timezone.
-  const matchStart = new Date(`${match.match_date}T${match.match_time}:00+07:00`);
-  if (isNaN(matchStart.getTime())) return 'upcoming'; // Gracefully handle invalid date strings
+  let matchStart: Date | null = null;
 
-  const durationHours = parseFloat(match.duration);
-  if (isNaN(durationHours)) return 'upcoming'; // Fallback if duration is invalid
+  // Try parsing match_date/time first, then fallback to kickoff_date/time
+  const primaryDate = new Date(`${match.match_date}T${match.match_time}:00+07:00`);
+  if (!isNaN(primaryDate.getTime())) {
+    matchStart = primaryDate;
+  } else {
+    const secondaryDate = new Date(`${match.kickoff_date}T${match.kickoff_time}:00+07:00`);
+    if (!isNaN(secondaryDate.getTime())) {
+      matchStart = secondaryDate;
+    }
+  }
+  
+  // If we couldn't parse any valid date, we can't determine the status, so treat as upcoming.
+  if (!matchStart) {
+    return 'upcoming';
+  }
+
+  // Handle duration parsing with a fallback
+  let durationHours = parseFloat(match.duration);
+  if (isNaN(durationHours) || durationHours <= 0) {
+    durationHours = 3; // Assume a default 3-hour duration if data is invalid
+  }
 
   const matchEnd = new Date(matchStart.getTime() + durationHours * 60 * 60 * 1000);
 
@@ -141,6 +158,23 @@ const App: React.FC = () => {
 
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
+
+  // Effect to periodically remove finished matches from the schedule
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setSchedule(currentSchedule => {
+        const updatedSchedule = currentSchedule.filter(match => getMatchStatus(match) !== 'past');
+        // Only return a new array if something has changed to prevent re-renders
+        if (updatedSchedule.length !== currentSchedule.length) {
+          return updatedSchedule;
+        }
+        return currentSchedule;
+      });
+    }, 60000); // Check every minute
+
+    return () => clearInterval(intervalId); // Cleanup on component unmount
+  }, []);
+
 
   const scrollToTop = () => {
     window.scrollTo({
