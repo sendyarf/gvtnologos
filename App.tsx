@@ -10,13 +10,13 @@ import UpdateNotification from './components/UpdateNotification';
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 
 const SearchIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
 );
 
 const ClearIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400 hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-secondary hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
     </svg>
 );
@@ -72,8 +72,7 @@ const App: React.FC = () => {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(false);
-  const { isUpdateAvailable, reloadPage, dismissUpdate } = useScheduleUpdater();
-
+  
 
   const fetchSchedule = useCallback(async () => {
     setLoading(true);
@@ -120,6 +119,9 @@ const App: React.FC = () => {
       setLoading(false);
     }
   }, []);
+  
+  const { isUpdateAvailable, triggerUpdate, dismissUpdate } = useScheduleUpdater(fetchSchedule);
+
 
   useEffect(() => {
     fetchSchedule();
@@ -164,7 +166,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex justify-center items-center h-[calc(100vh-200px)]">
           <LoadingSpinner />
         </div>
       );
@@ -172,11 +174,12 @@ const App: React.FC = () => {
 
     if (error) {
       return (
-        <div className="flex flex-col justify-center items-center h-screen text-center text-red-400">
-            <p className="text-xl">{error}</p>
+        <div className="flex flex-col justify-center items-center h-[calc(100vh-200px)] text-center text-warning">
+            <p className="text-xl mb-2">{error}</p>
+            <p className="text-secondary mb-6">There was an issue loading the schedule. Please try again.</p>
             <button
                 onClick={fetchSchedule}
-                className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+                className="mt-4 px-6 py-3 bg-accent1/20 text-accent1 border border-accent1 rounded-lg font-semibold hover:bg-accent1 hover:text-background transition-all"
             >
                 Try Again
             </button>
@@ -198,7 +201,7 @@ const App: React.FC = () => {
             placeholder="Search for a team or league..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800 border-2 border-slate-700 rounded-lg py-3 pl-12 pr-12 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+            className="w-full bg-surface border-2 border-surface-hover rounded-lg py-3 pl-12 pr-12 text-primary placeholder-secondary focus:outline-none focus:ring-2 focus:ring-accent1 focus:border-transparent transition-all"
             aria-label="Search matches"
           />
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -209,7 +212,7 @@ const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="focus:outline-none focus:ring-2 focus:ring-slate-500 rounded-full"
+                className="focus:outline-none focus:ring-2 focus:ring-secondary rounded-full"
                 aria-label="Clear search"
               >
                 <ClearIcon />
@@ -223,19 +226,19 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-gray-100 font-sans">
-      <header className="bg-slate-800/50 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+    <div className="min-h-screen bg-background text-primary font-sans">
+      <header className="bg-surface/80 backdrop-blur-sm shadow-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-teal-300 to-blue-500 cursor-pointer" onClick={() => { handleBackToSchedule(); fetchSchedule(); }}>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-accent1 to-accent2 cursor-pointer" onClick={() => { handleBackToSchedule(); fetchSchedule(); }}>
             GOVOET
           </h1>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             <a
               href="https://t.me/FootySch"
               target="_blank"
               rel="noopener noreferrer"
               title="Join Telegram"
-              className="text-slate-400 hover:text-teal-300 transition-colors"
+              className="p-2 rounded-full text-secondary hover:text-accent1 hover:bg-surface-hover transition-colors"
             >
               <TelegramIcon />
             </a>
@@ -244,7 +247,7 @@ const App: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               title="Donate"
-              className="text-slate-400 hover:text-teal-300 transition-colors"
+              className="p-2 rounded-full text-secondary hover:text-accent1 hover:bg-surface-hover transition-colors"
             >
               <DonateIcon />
             </a>
@@ -254,10 +257,11 @@ const App: React.FC = () => {
       <main className="container mx-auto p-4 md:p-6">
         {renderContent()}
       </main>
-      <footer className="text-center py-4 text-slate-500 text-sm">
+      <footer className="text-center py-6 text-secondary text-sm border-t border-surface-hover">
         <p>All streams are provided by third parties. We do not host any content.</p>
+        <p>&copy; {new Date().getFullYear()} GOVOET. All rights reserved.</p>
       </footer>
-      {isUpdateAvailable && <UpdateNotification onReload={reloadPage} onDismiss={dismissUpdate} />}
+      {isUpdateAvailable && <UpdateNotification onUpdate={triggerUpdate} onDismiss={dismissUpdate} />}
       {isScrollButtonVisible && <ScrollToTopButton onClick={scrollToTop} />}
     </div>
   );

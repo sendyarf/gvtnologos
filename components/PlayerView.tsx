@@ -18,21 +18,21 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack }) => {
   if (!match) return null;
 
   return (
-    <div className="animate-fade-in max-w-3xl mx-auto">
+    <div className="animate-fade-in max-w-4xl mx-auto">
       <button
         onClick={onBack}
-        className="mb-4 inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors text-lg"
+        className="mb-4 inline-flex items-center px-4 py-2 bg-surface hover:bg-surface-hover rounded-lg transition-colors text-lg font-semibold"
       >
         <BackArrowIcon />
         Back to Schedule
       </button>
 
-      <div className="mb-4 p-4 bg-slate-800 rounded-lg">
-        <p className="text-sm text-teal-400">{match.league}</p>
-        <h2 className="text-2xl font-bold">{match.team1.name} vs {match.team2.name}</h2>
+      <div className="mb-4 p-4 bg-surface rounded-lg">
+        <p className="text-sm font-semibold text-accent2">{match.league}</p>
+        <h2 className="text-2xl font-bold text-primary">{match.team1.name} vs {match.team2.name}</h2>
       </div>
 
-      <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl border-2 border-slate-700">
+      <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl shadow-black/50 border border-surface-hover">
         {currentServerUrl ? (
           <iframe
             key={currentServerUrl} // Re-mounts iframe on src change
@@ -43,23 +43,23 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack }) => {
             allowFullScreen
           ></iframe>
         ) : (
-          <div className="w-full h-full flex justify-center items-center">
-              <p className="text-slate-400">No stream available for this match.</p>
+          <div className="w-full h-full flex justify-center items-center bg-surface">
+              <p className="text-secondary">No stream available for this match.</p>
           </div>
         )}
       </div>
 
-      <div className="mt-6">
-        <h3 className="text-xl font-semibold mb-3">Select a Server:</h3>
-        <div className="flex flex-wrap gap-2">
+      <div className="mt-6 p-4 bg-surface rounded-lg">
+        <h3 className="text-xl font-semibold mb-3 text-primary">Select a Server:</h3>
+        <div className="flex flex-wrap gap-3">
           {match.servers.map((server, index) => (
             <button
               key={index}
               onClick={() => setCurrentServerUrl(server.url)}
-              className={`px-4 py-2 rounded-md font-semibold transition-all duration-200
+              className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 border-2
                 ${currentServerUrl === server.url
-                  ? 'bg-teal-500 text-white shadow-md scale-105'
-                  : 'bg-slate-700 hover:bg-slate-600 text-slate-200'
+                  ? 'bg-accent1 text-background border-accent1 shadow-md scale-105'
+                  : 'bg-surface-hover border-transparent hover:bg-accent2 hover:text-background text-primary'
                 }`}
             >
               {server.label}

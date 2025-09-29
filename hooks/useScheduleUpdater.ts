@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import type { Match } from '../types';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 const CHECK_INTERVAL = 60000; // 60 seconds
 
-export const useScheduleUpdater = () => {
+export const useScheduleUpdater = (onUpdate: () => void) => {
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
   const knownScheduleJSON = useRef<string | null>(null);
 
@@ -18,8 +17,7 @@ export const useScheduleUpdater = () => {
           console.error(`Background fetch failed: ${response.status}`);
           return;
         }
-        const data: Match[] = await response.json();
-        const latestJSON = JSON.stringify(data);
+        const latestJSON = await response.text();
 
         if (knownScheduleJSON.current === null) {
           // First check, establish baseline
@@ -46,8 +44,9 @@ export const useScheduleUpdater = () => {
     };
   }, []);
 
-  const reloadPage = () => {
-    window.location.reload();
+  const triggerUpdate = () => {
+    setIsUpdateAvailable(false);
+    onUpdate();
   };
 
   const dismissUpdate = () => {
@@ -56,7 +55,7 @@ export const useScheduleUpdater = () => {
 
   return {
     isUpdateAvailable,
-    reloadPage,
+    triggerUpdate,
     dismissUpdate,
   };
 };
