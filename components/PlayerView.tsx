@@ -73,9 +73,9 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack }) => {
               </div>
             </div>
             <div className="flex items-center justify-between gap-4">
-               <h2 className="text-2xl md:text-3xl font-bold text-primary text-left truncate">{match.team1.name}</h2>
-               <span className="text-secondary font-mono text-xl">VS</span>
-               <h2 className="text-2xl md:text-3xl font-bold text-primary text-right truncate">{match.team2.name}</h2>
+               <h2 className="flex-1 text-2xl md:text-3xl font-bold text-primary text-left truncate min-w-0">{match.team1.name}</h2>
+               <span className="text-secondary font-mono text-xl px-2">VS</span>
+               <h2 className="flex-1 text-2xl md:text-3xl font-bold text-primary text-right truncate min-w-0">{match.team2.name}</h2>
             </div>
           </div>
         </div>

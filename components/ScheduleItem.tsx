@@ -83,11 +83,11 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
       </div>
 
       {/* Teams & League Column */}
-      <div className="flex-grow">
+      <div className="flex-grow min-w-0">
         <div className="flex items-center text-center">
-          <p className="flex-1 text-base md:text-lg font-bold text-primary text-right truncate">{match.team1.name}</p>
+          <p className="flex-1 text-base md:text-lg font-bold text-primary text-right truncate min-w-0">{match.team1.name}</p>
           <span className="text-secondary font-mono text-xs mx-3">VS</span>
-          <p className="flex-1 text-base md:text-lg font-bold text-primary text-left truncate">{match.team2.name}</p>
+          <p className="flex-1 text-base md:text-lg font-bold text-primary text-left truncate min-w-0">{match.team2.name}</p>
         </div>
         <p className="text-sm text-center font-semibold text-secondary mt-1 truncate">{match.league}</p>
       </div>
