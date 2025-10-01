@@ -20,7 +20,7 @@ const CloseIcon = () => (
 
 const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onUpdate, onDismiss }) => {
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-surface text-primary p-4 rounded-lg shadow-2xl flex items-center justify-between z-[60] animate-fade-in-up">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-11/12 max-w-md sm:left-auto sm:right-6 sm:-translate-x-0 sm:w-full sm:max-w-sm bg-surface text-primary p-4 rounded-lg shadow-2xl flex items-center justify-between z-[60] animate-fade-in-up">
       <div className="flex items-center">
         <RefreshIcon />
         <p className="font-semibold">New schedule available!</p>
