@@ -22,6 +22,7 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh }) => 
   
   const status = getMatchStatus(match);
   const isLive = status === 'live';
+  const isUpcoming = status === 'upcoming';
   const matchDate = getMatchStartDate(match);
 
   if (!match) return null;
@@ -42,32 +43,37 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh }) => 
         <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Video Player or Countdown */}
           <div className="aspect-video bg-black rounded-lg overflow-hidden border border-border shadow-2xl shadow-black/30">
-             {isLive ? (
-                currentServerUrl ? (
-                <iframe
-                    key={currentServerUrl} // Re-mounts iframe on src change
-                    src={currentServerUrl}
-                    title="Live Stream Player"
-                    className="w-full h-full"
-                    allow="encrypted-media; autoplay; fullscreen"
-                    allowFullScreen
-                    scrolling="no"
-                ></iframe>
-                ) : (
+            {isLive ? (
+              currentServerUrl ? (
+              <iframe
+                  key={currentServerUrl} // Re-mounts iframe on src change
+                  src={currentServerUrl}
+                  title="Live Stream Player"
+                  className="w-full h-full"
+                  allow="encrypted-media; autoplay; fullscreen"
+                  allowFullScreen
+                  scrolling="no"
+              ></iframe>
+              ) : (
+              <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
+                  <p className="text-secondary font-semibold mt-2">No stream available for this match.</p>
+                  <p className="text-secondary text-sm mt-1">Please select a different server if available.</p>
+              </div>
+              )
+            ) : isUpcoming ? (
+              matchDate ? (
+                <CountdownTimer targetDate={matchDate} onCountdownFinish={onRefresh} />
+              ) : (
                 <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
-                    <p className="text-secondary font-semibold mt-2">No stream available for this match.</p>
-                    <p className="text-secondary text-sm mt-1">Please select a different server if available.</p>
+                    <p className="text-secondary font-semibold">Match time is not available.</p>
                 </div>
-                )
-             ) : (
-                matchDate ? (
-                  <CountdownTimer targetDate={matchDate} onCountdownFinish={onRefresh} />
-                ) : (
-                  <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
-                      <p className="text-secondary font-semibold">Match time is not available.</p>
-                  </div>
-                )
-             )}
+              )
+            ) : ( // Past status
+              <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
+                <h3 className="text-2xl font-bold text-primary mb-2">Match Has Finished</h3>
+                <p className="text-secondary">This match is no longer available to watch.</p>
+              </div>
+            )}
           </div>
 
           {/* Match Info */}

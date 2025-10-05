@@ -37,7 +37,10 @@ const App: React.FC = () => {
   
 
   const fetchSchedule = useCallback(async () => {
-    setLoading(true);
+    // Only show initial loading spinner, not for background refreshes
+    if (!schedule.length) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const response = await fetch(SCHEDULE_URL);
@@ -69,6 +72,17 @@ const App: React.FC = () => {
         });
         
       setSchedule(sortedData);
+      
+      // Use functional update to get current selected match and update it.
+      // This avoids stale closures and dependency issues with useCallback.
+      setSelectedMatch(currentMatch => {
+        if (!currentMatch) return null;
+        const updatedMatch = sortedData.find(m => m.id === currentMatch.id);
+        // If match not found, it's likely finished and filtered out.
+        // Return null to go back to the schedule list.
+        return updatedMatch || null;
+      });
+
     } catch (e) {
       if (e instanceof Error) {
         setError(`Failed to fetch schedule: ${e.message}`);
@@ -78,7 +92,7 @@ const App: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [schedule.length]);
   
   const { isUpdateAvailable, triggerUpdate, dismissUpdate } = useScheduleUpdater(fetchSchedule);
 
@@ -162,7 +176,7 @@ const App: React.FC = () => {
             <p className="text-xl font-medium mb-2">{error}</p>
             <p className="text-secondary mb-6">There was an issue loading the schedule. Please try again.</p>
             <button
-                onClick={fetchSchedule}
+                onClick={() => fetchSchedule()}
                 className="mt-4 px-5 py-2.5 bg-accent1/10 text-accent1 border border-accent1/30 rounded-lg font-semibold hover:bg-accent1 hover:text-white transition-all duration-300"
             >
                 Try Again
