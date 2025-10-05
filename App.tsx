@@ -6,80 +6,25 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import { useScheduleUpdater } from './hooks/useScheduleUpdater';
 import UpdateNotification from './components/UpdateNotification';
+import { getMatchStatus } from './utils/date';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 
-const SearchIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
+const SearchIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
 );
 
-const ClearIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-secondary hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-    </svg>
+const ClearIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 );
 
 const TelegramIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12.001 2.005a9.995 9.995 0 100 19.99 9.995 9.995 0 000-19.99zm5.405 7.152l-2.071 9.692c-.15.706-.57 1.05-1.233.655l-4.72-3.478-2.28 2.193a.925.925 0 01-.72.316l.32-4.81 8.783-7.854c.38-.34-.078-.52-.6-.203l-10.85 6.78-4.66-1.453c-.7-.218-.71-.926.14-1.353l17.09-6.556c.58-.224 1.09.122.9 1.01z"></path>
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
 );
 
 const DonateIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"></path></svg>
 );
-
-const getMatchStatus = (match: Match): 'live' | 'upcoming' | 'past' => {
-  // Manual override from data source
-  if (
-    ['live', 'Live', 'LIVE'].includes(match.kickoff_date) ||
-    ['live', 'Live', 'LIVE'].includes(match.match_date) ||
-    ['live', 'Live', 'LIVE'].includes(match.kickoff_time) ||
-    ['live', 'Live', 'LIVE'].includes(match.match_time) ||
-    ['live', 'Live', 'LIVE'].includes(match.duration)
-  ) {
-    return 'live';
-  }
-
-  const now = new Date();
-  let matchStart: Date | null = null;
-
-  // Try parsing match_date/time first, then fallback to kickoff_date/time
-  const primaryDate = new Date(`${match.match_date}T${match.match_time}:00+07:00`);
-  if (!isNaN(primaryDate.getTime())) {
-    matchStart = primaryDate;
-  } else {
-    const secondaryDate = new Date(`${match.kickoff_date}T${match.kickoff_time}:00+07:00`);
-    if (!isNaN(secondaryDate.getTime())) {
-      matchStart = secondaryDate;
-    }
-  }
-  
-  // If we couldn't parse any valid date, we can't determine the status, so treat as upcoming.
-  if (!matchStart) {
-    return 'upcoming';
-  }
-
-  // Handle duration parsing with a fallback
-  let durationHours = parseFloat(match.duration);
-  if (isNaN(durationHours) || durationHours <= 0) {
-    durationHours = 3; // Assume a default 3-hour duration if data is invalid
-  }
-
-  const matchEnd = new Date(matchStart.getTime() + durationHours * 60 * 60 * 1000);
-
-  if (now >= matchStart && now <= matchEnd) {
-    return 'live';
-  }
-  if (now > matchEnd) {
-    return 'past';
-  }
-  return 'upcoming';
-};
 
 
 const App: React.FC = () => {
@@ -113,16 +58,14 @@ const App: React.FC = () => {
             return statusPriority[statusA] - statusPriority[statusB];
           }
 
-          // This part only runs if both matches are 'upcoming'
           if (statusA === 'upcoming') {
             const dateA = new Date(`${a.match_date}T${a.match_time}:00+07:00`);
             const dateB = new Date(`${b.match_date}T${b.match_time}:00+07:00`);
-            // Handle potential invalid dates in sorting
             if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
               return dateA.getTime() - dateB.getTime();
             }
           }
-          return 0; // Keep original order if dates are invalid or status is not 'upcoming'
+          return 0;
         });
         
       setSchedule(sortedData);
@@ -147,7 +90,7 @@ const App: React.FC = () => {
 
     useEffect(() => {
     const toggleVisibility = () => {
-      if (window.scrollY > 200) {
+      if (window.scrollY > 300) {
         setIsScrollButtonVisible(true);
       } else {
         setIsScrollButtonVisible(false);
@@ -159,20 +102,18 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  // Effect to periodically remove finished matches from the schedule
   useEffect(() => {
     const intervalId = setInterval(() => {
       setSchedule(currentSchedule => {
         const updatedSchedule = currentSchedule.filter(match => getMatchStatus(match) !== 'past');
-        // Only return a new array if something has changed to prevent re-renders
         if (updatedSchedule.length !== currentSchedule.length) {
           return updatedSchedule;
         }
         return currentSchedule;
       });
-    }, 60000); // Check every minute
+    }, 60000);
 
-    return () => clearInterval(intervalId); // Cleanup on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
 
@@ -185,11 +126,20 @@ const App: React.FC = () => {
 
   const handleSelectMatch = (match: Match) => {
     setSelectedMatch(match);
+    window.scrollTo(0, 0);
   };
 
   const handleBackToSchedule = () => {
     setSelectedMatch(null);
   };
+  
+  const handleLogoClick = () => {
+    if (selectedMatch) {
+      handleBackToSchedule();
+    }
+    setSearchQuery('');
+    fetchSchedule();
+  }
 
   const filteredMatches = schedule.filter(match =>
     match.team1.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -200,7 +150,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex justify-center items-center h-[calc(100vh-200px)]">
+        <div className="flex justify-center items-center h-[calc(100vh-250px)]">
           <LoadingSpinner />
         </div>
       );
@@ -208,12 +158,12 @@ const App: React.FC = () => {
 
     if (error) {
       return (
-        <div className="flex flex-col justify-center items-center h-[calc(100vh-200px)] text-center text-warning">
-            <p className="text-xl mb-2">{error}</p>
+        <div className="flex flex-col justify-center items-center h-[calc(100vh-250px)] text-center text-warning">
+            <p className="text-xl font-medium mb-2">{error}</p>
             <p className="text-secondary mb-6">There was an issue loading the schedule. Please try again.</p>
             <button
                 onClick={fetchSchedule}
-                className="mt-4 px-6 py-3 bg-accent1/20 text-accent1 border border-accent1 rounded-lg font-semibold hover:bg-accent1 hover:text-background transition-all"
+                className="mt-4 px-5 py-2.5 bg-accent1/10 text-accent1 border border-accent1/30 rounded-lg font-semibold hover:bg-accent1 hover:text-white transition-all duration-300"
             >
                 Try Again
             </button>
@@ -223,33 +173,33 @@ const App: React.FC = () => {
     
     if (selectedMatch) {
       return (
-        <PlayerView match={selectedMatch} onBack={handleBackToSchedule} />
+        <PlayerView match={selectedMatch} onBack={handleBackToSchedule} onRefresh={fetchSchedule} />
       );
     }
 
     return (
       <>
-        <div className="mb-6 relative">
+        <div className="mb-8 relative">
           <input
             type="text"
-            placeholder="Search for a team or league..."
+            placeholder="Search for team, league..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-surface border-2 border-surface-hover rounded-lg py-3 pl-12 pr-12 text-primary placeholder-secondary focus:outline-none focus:ring-2 focus:ring-accent1 focus:border-transparent transition-all"
+            className="w-full bg-surface border border-border rounded-lg py-3 pl-11 pr-10 text-primary placeholder-secondary focus:outline-none focus:ring-2 focus:ring-accent1/50 focus:border-accent1/50 transition-all"
             aria-label="Search matches"
           />
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <SearchIcon />
+            <SearchIcon className="text-secondary" />
           </div>
           {searchQuery && (
-            <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="focus:outline-none focus:ring-2 focus:ring-secondary rounded-full"
+                className="p-1.5 focus:outline-none focus:ring-2 focus:ring-secondary/50 rounded-full group"
                 aria-label="Clear search"
               >
-                <ClearIcon />
+                <ClearIcon className="text-secondary group-hover:text-primary transition-colors" />
               </button>
             </div>
           )}
@@ -261,18 +211,18 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-primary font-sans">
-      <header className="bg-surface/80 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+      <header className="bg-background/80 backdrop-blur-lg border-b border-border/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-accent1 to-accent2 cursor-pointer" onClick={() => { handleBackToSchedule(); fetchSchedule(); }}>
-            GOVOET
+          <h1 className="text-3xl font-extrabold cursor-pointer" onClick={handleLogoClick}>
+            <span className="bg-clip-text text-transparent bg-gradient-to-br from-accent1 to-accent2">GOVOET</span>
           </h1>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1">
             <a
               href="https://t.me/FootySch"
               target="_blank"
               rel="noopener noreferrer"
               title="Join Telegram"
-              className="p-2 rounded-full text-secondary hover:text-accent1 hover:bg-surface-hover transition-colors"
+              className="p-2 rounded-lg text-secondary hover:text-accent1 hover:bg-surface transition-colors"
             >
               <TelegramIcon />
             </a>
@@ -281,19 +231,19 @@ const App: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               title="Donate"
-              className="p-2 rounded-full text-secondary hover:text-accent1 hover:bg-surface-hover transition-colors"
+              className="p-2 rounded-lg text-secondary hover:text-accent2 hover:bg-surface transition-colors"
             >
               <DonateIcon />
             </a>
           </div>
         </div>
       </header>
-      <main className="container mx-auto p-4 md:p-6">
+      <main className="container mx-auto p-4 md:p-8">
         {renderContent()}
       </main>
-      <footer className="text-center py-6 text-secondary text-sm border-t border-surface-hover">
+      <footer className="text-center py-8 text-secondary/80 text-xs border-t border-border mt-8">
         <p>All streams are provided by third parties. We do not host any content.</p>
-        <p>&copy; {new Date().getFullYear()} GOVOET. All rights reserved.</p>
+        <p className="mt-2">&copy; {new Date().getFullYear()} GOVOET. All Rights Reserved.</p>
       </footer>
       {isUpdateAvailable && <UpdateNotification onUpdate={triggerUpdate} onDismiss={dismissUpdate} />}
       {isScrollButtonVisible && <ScrollToTopButton onClick={scrollToTop} />}

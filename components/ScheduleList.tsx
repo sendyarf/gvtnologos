@@ -7,28 +7,33 @@ interface ScheduleListProps {
   onSelectMatch: (match: Match) => void;
 }
 
-const SearchIconLarge = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="absolute -top-10 left-1/2 -translate-x-1/2 h-64 w-64 text-surface-hover -z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={0.5}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-  </svg>
+const NoMatchesIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-border">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <line x1="13.5" y1="8.5" x2="8.5" y2="13.5"></line>
+        <line x1="8.5" y1="8.5" x2="13.5" y2="13.5"></line>
+    </svg>
 );
 
 
 const ScheduleList: React.FC<ScheduleListProps> = ({ matches, onSelectMatch }) => {
   if (matches.length === 0) {
     return (
-      <div className="text-center py-20 relative overflow-hidden">
-        <SearchIconLarge />
-        <h2 className="text-2xl font-bold text-primary">No Matches Found</h2>
-        <p className="text-secondary mt-2">Try adjusting your search or check back later.</p>
+      <div className="text-center py-24 flex flex-col items-center border border-dashed border-border rounded-lg">
+        <NoMatchesIcon />
+        <h2 className="text-xl font-semibold text-primary mt-6">No Matches Found</h2>
+        <p className="text-secondary mt-2">Your search did not return any results. Please try again.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {matches.map((match) => (
-        <ScheduleItem key={match.id} match={match} onSelect={onSelectMatch} />
+    <div className="space-y-3">
+      {matches.map((match, index) => (
+        <div key={match.id} style={{ animationDelay: `${index * 50}ms`}} className="animate-fade-in-up opacity-0">
+          <ScheduleItem match={match} onSelect={onSelectMatch} />
+        </div>
       ))}
     </div>
   );

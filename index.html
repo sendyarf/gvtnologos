@@ -3,56 +3,67 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GOVOET - Live Sports Stream</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231E1E1E'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-size='70' font-weight='bold' fill='%23AB47BC' font-family='sans-serif'%3EG%3C/text%3E%3C/svg%3E" />
+    <title>GOVOET - Live Sports Streaming</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233B82F6'/%3E%3Cstop offset='100%25' stop-color='%238B5CF6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='%230A0A0A'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-size='70' font-weight='800' fill='url(%23g)' font-family='Inter, sans-serif'%3EG%3C/text%3E%3C/svg%3E" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              background: '#121212',
-              primary: '#E0E0E0',
+              background: '#0A0A0A',
+              primary: '#F0F0F0',
               secondary: '#A0A0A0',
-              accent1: '#40C4FF',
-              accent2: '#AB47BC',
-              warning: '#EF5350',
-              surface: '#1E1E1E',
-              'surface-hover': '#2A2A2A',
+              accent1: '#3B82F6',
+              accent2: '#8B5CF6',
+              warning: '#EF4444',
+              surface: '#191919',
+              'surface-hover': '#242424',
+              border: '#2E2E2E',
             }
           }
         }
       }
     </script>
     <style>
-      /* Custom scrollbar for a more modern look */
+      body {
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #0A0A0A;
+      }
+      /* Custom scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
+        height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #1E1E1E; /* surface */
+        background: #0A0A0A;
       }
       ::-webkit-scrollbar-thumb {
-        background: #A0A0A0; /* secondary */
+        background: #2E2E2E;
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #E0E0E0; /* primary */
+        background: #A0A0A0;
       }
 
-      /* Animation for notification */
+      /* Animations */
       @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
       }
       .animate-fade-in {
-        animation: fadeIn 0.5s ease-in-out;
+        animation: fadeIn 0.3s ease-in-out;
       }
 
       @keyframes fadeInUp {
         from {
           opacity: 0;
-          transform: translateY(20px);
+          transform: translateY(10px);
         }
         to {
           opacity: 1;
@@ -60,7 +71,7 @@
         }
       }
       .animate-fade-in-up {
-        animation: fadeInUp 0.5s ease-out forwards;
+        animation: fadeInUp 0.4s ease-out forwards;
       }
     </style>
   <script type="importmap">
