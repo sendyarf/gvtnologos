@@ -15,8 +15,8 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
   let formattedDate = '';
 
   if (!isLive) {
-    const primaryDate = new Date(`${match.match_date}T${match.match_time}:00+07:00`);
-    const kickoffDate = !isNaN(primaryDate.getTime()) ? primaryDate : new Date(`${match.kickoff_date}T${match.kickoff_time}:00+07:00`);
+    // Per user request, schedule list display should use kickoff_date and kickoff_time
+    const kickoffDate = new Date(`${match.kickoff_date}T${match.kickoff_time}:00+07:00`);
 
     if (!isNaN(kickoffDate.getTime())) {
         formattedTime = kickoffDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });

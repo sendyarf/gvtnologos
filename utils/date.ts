@@ -49,16 +49,10 @@ export const getMatchStatus = (match: Match): 'live' | 'upcoming' | 'past' => {
 };
 
 export const getMatchStartDate = (match: Match): Date | null => {
-    let matchStart: Date | null = null;
-    // Try parsing match_date/time first, then fallback to kickoff_date/time
-    const primaryDate = new Date(`${match.match_date}T${match.match_time}:00+07:00`);
-    if (!isNaN(primaryDate.getTime())) {
-        matchStart = primaryDate;
-    } else {
-        const secondaryDate = new Date(`${match.kickoff_date}T${match.kickoff_time}:00+07:00`);
-        if (!isNaN(secondaryDate.getTime())) {
-            matchStart = secondaryDate;
-        }
+    // Per user request, countdown should use match_date and match_time
+    const matchStart = new Date(`${match.match_date}T${match.match_time}:00+07:00`);
+    if (!isNaN(matchStart.getTime())) {
+        return matchStart;
     }
-    return matchStart;
+    return null;
 }
