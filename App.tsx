@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import type { Match } from './types';
 import ScheduleList from './components/ScheduleList';
 import PlayerView from './components/PlayerView';
@@ -7,6 +7,7 @@ import ScrollToTopButton from './components/ScrollToTopButton';
 import { useScheduleUpdater } from './hooks/useScheduleUpdater';
 import UpdateNotification from './components/UpdateNotification';
 import { getMatchStatus } from './utils/date';
+import ShareToast from './components/ShareToast';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 
@@ -34,6 +35,8 @@ const App: React.FC = () => {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(false);
+  const [showCopyToast, setShowCopyToast] = useState(false);
+  const initialUrlChecked = useRef(false);
   
 
   const fetchSchedule = useCallback(async () => {
@@ -73,13 +76,9 @@ const App: React.FC = () => {
         
       setSchedule(sortedData);
       
-      // Use functional update to get current selected match and update it.
-      // This avoids stale closures and dependency issues with useCallback.
       setSelectedMatch(currentMatch => {
         if (!currentMatch) return null;
         const updatedMatch = sortedData.find(m => m.id === currentMatch.id);
-        // If match not found, it's likely finished and filtered out.
-        // Return null to go back to the schedule list.
         return updatedMatch || null;
       });
 
@@ -99,8 +98,47 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchSchedule();
+    
+    const handlePopState = () => {
+        const path = window.location.pathname;
+        if (path === '/') {
+            setSelectedMatch(null);
+        } else {
+            const matchId = path.substring(1);
+            // We need to wait for schedule to be loaded, this is handled in another useEffect
+            // This is mainly for browser back/forward buttons
+            setSchedule(currentSchedule => {
+                const matchFromUrl = currentSchedule.find(m => m.id === matchId);
+                if (matchFromUrl) {
+                    setSelectedMatch(matchFromUrl);
+                }
+                return currentSchedule;
+            });
+        }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+        window.removeEventListener('popstate', handlePopState);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Handle direct URL access
+  useEffect(() => {
+    if (schedule.length > 0 && !initialUrlChecked.current) {
+      const path = window.location.pathname;
+      if (path !== '/') {
+        const matchId = path.substring(1);
+        const matchFromUrl = schedule.find(m => m.id === matchId);
+        if (matchFromUrl) {
+          setSelectedMatch(matchFromUrl);
+        }
+      }
+      initialUrlChecked.current = true;
+    }
+  }, [schedule]);
+
 
     useEffect(() => {
     const toggleVisibility = () => {
@@ -140,20 +178,31 @@ const App: React.FC = () => {
 
   const handleSelectMatch = (match: Match) => {
     setSelectedMatch(match);
+    window.history.pushState({}, '', `/${match.id}`);
     window.scrollTo(0, 0);
   };
 
   const handleBackToSchedule = () => {
     setSelectedMatch(null);
+    window.history.pushState({}, '', '/');
   };
   
   const handleLogoClick = () => {
     if (selectedMatch) {
       handleBackToSchedule();
+    } else {
+       window.history.pushState({}, '', '/');
     }
     setSearchQuery('');
     fetchSchedule();
   }
+
+  const handleShareSuccess = () => {
+    setShowCopyToast(true);
+    setTimeout(() => {
+        setShowCopyToast(false);
+    }, 3000);
+  };
 
   const filteredMatches = schedule.filter(match =>
     match.team1.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -187,7 +236,7 @@ const App: React.FC = () => {
     
     if (selectedMatch) {
       return (
-        <PlayerView match={selectedMatch} onBack={handleBackToSchedule} onRefresh={fetchSchedule} />
+        <PlayerView match={selectedMatch} onBack={handleBackToSchedule} onRefresh={fetchSchedule} onShareSuccess={handleShareSuccess} />
       );
     }
 
@@ -261,6 +310,7 @@ const App: React.FC = () => {
       </footer>
       {isUpdateAvailable && <UpdateNotification onUpdate={triggerUpdate} onDismiss={dismissUpdate} />}
       {isScrollButtonVisible && <ScrollToTopButton onClick={scrollToTop} />}
+      {showCopyToast && <ShareToast />}
     </div>
   );
 };

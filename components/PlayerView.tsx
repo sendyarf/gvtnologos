@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import type { Match } from '../types';
 import { getMatchStatus, getMatchStartDate } from '../utils/date';
 import CountdownTimer from './CountdownTimer';
+import { shareMatchUrl } from '../utils/share';
 
 interface PlayerViewProps {
   match: Match;
   onBack: () => void;
   onRefresh: () => void;
+  onShareSuccess: () => void;
 }
 
 const BackArrowIcon = ({ className }: { className?: string }) => (
@@ -17,13 +19,24 @@ const ServersIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
 );
 
-const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh }) => {
+const ShareIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+);
+
+const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onShareSuccess }) => {
   const [currentServerUrl, setCurrentServerUrl] = useState<string>(match.servers[0]?.url || '');
   
   const status = getMatchStatus(match);
   const isLive = status === 'live';
   const isUpcoming = status === 'upcoming';
   const matchDate = getMatchStartDate(match);
+
+  const handleShare = async () => {
+    const copiedToClipboard = await shareMatchUrl(match);
+    if (copiedToClipboard) {
+      onShareSuccess();
+    }
+  };
 
   if (!match) return null;
 
@@ -78,19 +91,31 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh }) => 
 
           {/* Match Info */}
           <div className="bg-surface border border-border rounded-lg p-4 md:p-6">
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-md font-medium text-secondary truncate pr-4">{match.league}</p>
-              {isLive && (
-                <div className="flex items-center gap-2 px-3 py-1 font-semibold text-accent2 text-sm bg-accent2/10 rounded-full">
-                    <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent2 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-accent2"></span>
-                    </span>
-                    <span>LIVE</span>
-                </div>
-              )}
+            <div className="flex justify-between items-start gap-4">
+              <div className='min-w-0'>
+                <p className="text-md font-medium text-secondary truncate">{match.league}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                {isLive && (
+                  <div className="flex items-center gap-2 px-3 py-1 font-semibold text-accent2 text-sm bg-accent2/10 rounded-full shrink-0">
+                      <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent2 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-accent2"></span>
+                      </span>
+                      <span>LIVE</span>
+                  </div>
+                )}
+                <button 
+                  onClick={handleShare}
+                  aria-label="Share match"
+                  title="Share Match URL"
+                  className="p-2 rounded-full text-secondary hover:bg-surface-hover hover:text-primary transition-colors"
+                >
+                    <ShareIcon />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-center gap-2 md:gap-4">
+            <div className="flex items-center justify-center gap-2 md:gap-4 mt-3">
                 {match.team2.name ? (
                     <>
                         <h2 className="flex-1 text-xl md:text-3xl font-bold text-primary text-right truncate min-w-0">{match.team1.name}</h2>

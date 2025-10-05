@@ -14,17 +14,15 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
   let formattedTime = 'TBD';
   let formattedDate = '';
 
-  if (!isLive) {
-    // Per user request, schedule list display should use kickoff_date and kickoff_time
-    const kickoffDate = new Date(`${match.kickoff_date}T${match.kickoff_time}:00+07:00`);
+  // Per user request, schedule list display should use kickoff_date and kickoff_time
+  const kickoffDate = new Date(`${match.kickoff_date}T${match.kickoff_time}:00+07:00`);
 
-    if (!isNaN(kickoffDate.getTime())) {
-        formattedTime = kickoffDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-        formattedDate = kickoffDate.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
-    }
+  if (!isNaN(kickoffDate.getTime())) {
+      formattedTime = kickoffDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      formattedDate = kickoffDate.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
   }
 
-  const itemClasses = `group bg-surface border border-border rounded-lg p-3 md:p-4 transition-all duration-300 flex items-center gap-3 md:gap-6 cursor-pointer hover:bg-surface-hover hover:border-accent1/30`;
+  const itemClasses = `group bg-surface border border-border rounded-lg p-3 md:p-4 transition-all duration-300 flex items-center gap-3 md:gap-4 cursor-pointer hover:bg-surface-hover hover:border-accent1/30`;
 
   return (
     <div
@@ -68,12 +66,14 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
         <p className="text-sm text-center text-secondary mt-1 truncate">{match.league}</p>
       </div>
 
-      {/* Arrow right on hover */}
-      <div className="w-12 flex items-center justify-end shrink-0 text-secondary group-hover:text-primary transition-colors duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform transition-transform duration-300 group-hover:translate-x-1">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-          <polyline points="12 5 19 12 12 19"></polyline>
-        </svg>
+      {/* Action Icons Column */}
+      <div className="w-16 flex items-center justify-end shrink-0 text-secondary">
+          <div className="group-hover:text-primary transition-colors duration-300 ml-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform transition-transform duration-300 group-hover:translate-x-1">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
       </div>
     </div>
   );
