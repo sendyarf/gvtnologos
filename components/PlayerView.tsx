@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { Match } from '../types';
 import { getMatchStatus, getMatchStartDate } from '../utils/date';
 import CountdownTimer from './CountdownTimer';
-import { shareMatchUrl } from '../utils/share';
+import { copyMatchUrl } from '../utils/share';
 
 interface PlayerViewProps {
   match: Match;
@@ -19,8 +19,11 @@ const ServersIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
 );
 
-const ShareIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+const CopyIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </svg>
 );
 
 const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onShareSuccess }) => {
@@ -31,8 +34,8 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
   const isUpcoming = status === 'upcoming';
   const matchDate = getMatchStartDate(match);
 
-  const handleShare = async () => {
-    const copiedToClipboard = await shareMatchUrl(match);
+  const handleCopyUrl = async () => {
+    const copiedToClipboard = await copyMatchUrl(match);
     if (copiedToClipboard) {
       onShareSuccess();
     }
@@ -93,7 +96,7 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
           <div className="bg-surface border border-border rounded-lg p-4 md:p-6">
             <div className="flex justify-between items-start gap-4">
               <div className='min-w-0'>
-                <p className="text-md font-medium text-secondary truncate">{match.league}</p>
+                <p className="text-md font-medium text-secondary truncate">{match.league || 'Unknown League'}</p>
               </div>
               <div className="flex items-center gap-1">
                 {isLive && (
@@ -106,24 +109,24 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
                   </div>
                 )}
                 <button 
-                  onClick={handleShare}
-                  aria-label="Share match"
-                  title="Share Match URL"
+                  onClick={handleCopyUrl}
+                  aria-label="Copy Match URL"
+                  title="Copy Match URL"
                   className="p-2 rounded-full text-secondary hover:bg-surface-hover hover:text-primary transition-colors"
                 >
-                    <ShareIcon />
+                    <CopyIcon />
                 </button>
               </div>
             </div>
             <div className="flex items-center justify-center gap-2 md:gap-4 mt-3">
-                {match.team2.name ? (
+                {match.team2?.name ? (
                     <>
-                        <h2 className="flex-1 text-xl md:text-3xl font-bold text-primary text-right truncate min-w-0">{match.team1.name}</h2>
+                        <h2 className="flex-1 text-xl md:text-3xl font-bold text-primary text-right truncate min-w-0">{match.team1?.name || 'TBA'}</h2>
                         <span className="text-secondary font-mono text-lg md:text-xl px-1 md:px-2">VS</span>
-                        <h2 className="flex-1 text-xl md:text-3xl font-bold text-primary text-left truncate min-w-0">{match.team2.name}</h2>
+                        <h2 className="flex-1 text-xl md:text-3xl font-bold text-primary text-left truncate min-w-0">{match.team2?.name || 'TBA'}</h2>
                     </>
                 ) : (
-                    <h2 className="text-xl md:text-3xl font-bold text-primary text-center truncate w-full">{match.team1.name}</h2>
+                    <h2 className="text-xl md:text-3xl font-bold text-primary text-center truncate w-full">{match.team1?.name || 'TBA'}</h2>
                 )}
             </div>
           </div>

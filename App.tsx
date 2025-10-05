@@ -205,9 +205,9 @@ const App: React.FC = () => {
   };
 
   const filteredMatches = schedule.filter(match =>
-    match.team1.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    match.team2.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    match.league.toLowerCase().includes(searchQuery.toLowerCase())
+    (match.team1?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (match.team2?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (match.league || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const renderContent = () => {

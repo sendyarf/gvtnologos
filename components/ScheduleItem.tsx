@@ -52,18 +52,18 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
       
       {/* Teams & League Column */}
       <div className="flex-grow min-w-0">
-        {match.team2.name ? (
+        {match.team2?.name ? (
             <div className="flex flex-col md:flex-row md:items-center text-center">
-              <p className="text-base md:text-lg font-bold text-primary truncate md:text-right md:flex-1">{match.team1.name}</p>
+              <p className="text-base md:text-lg font-bold text-primary truncate md:text-right md:flex-1">{match.team1?.name || 'TBA'}</p>
               <span className="text-secondary font-mono text-xs md:text-sm my-0.5 md:my-0 md:mx-4">vs</span>
-              <p className="text-base md:text-lg font-bold text-primary truncate md:text-left md:flex-1">{match.team2.name}</p>
+              <p className="text-base md:text-lg font-bold text-primary truncate md:text-left md:flex-1">{match.team2?.name || 'TBA'}</p>
             </div>
         ) : (
             <div className="text-center">
-                <p className="text-base md:text-lg font-bold text-primary truncate">{match.team1.name}</p>
+                <p className="text-base md:text-lg font-bold text-primary truncate">{match.team1?.name || 'TBA'}</p>
             </div>
         )}
-        <p className="text-sm text-center text-secondary mt-1 truncate">{match.league}</p>
+        <p className="text-sm text-center text-secondary mt-1 truncate">{match.league || 'Unknown League'}</p>
       </div>
 
       {/* Action Icons Column */}

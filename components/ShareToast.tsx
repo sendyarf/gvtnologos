@@ -15,7 +15,7 @@ const ShareToast: React.FC = () => {
         aria-live="assertive"
     >
       <ClipboardIcon />
-      <p className="font-semibold text-sm">Schedule copied to clipboard!</p>
+      <p className="font-semibold text-sm">Match URL copied to clipboard!</p>
     </div>
   );
 };
