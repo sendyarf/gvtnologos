@@ -10,7 +10,7 @@ const ClipboardIcon = () => (
 const ShareToast: React.FC = () => {
   return (
     <div 
-        className="fixed bottom-6 inset-x-6 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 bg-surface text-primary p-4 rounded-lg border border-border shadow-2xl shadow-black/40 flex items-center z-[60] animate-fade-in-up"
+        className="fixed top-6 inset-x-6 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 bg-surface text-primary p-4 rounded-lg border border-border shadow-2xl shadow-black/40 flex items-center z-[60] animate-fade-in-down"
         role="alert"
         aria-live="assertive"
     >
