@@ -8,8 +8,18 @@ import { useScheduleUpdater } from './hooks/useScheduleUpdater';
 import UpdateNotification from './components/UpdateNotification';
 import { getMatchStatus } from './utils/date';
 import ShareToast from './components/ShareToast';
+import LeagueFilter from './components/LeagueFilter';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
+
+const POPULAR_LEAGUES = [
+    'UEFA Champions League',
+    'England - Premier League',
+    'Spain - La Liga',
+    'Italy - Serie A',
+    'Germany - Bundesliga',
+    'France - Ligue 1'
+];
 
 const SearchIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -34,6 +44,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLeague, setSelectedLeague] = useState<string | null>(null);
   const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const initialUrlChecked = useRef(false);
@@ -194,6 +205,7 @@ const App: React.FC = () => {
        window.history.pushState({}, '', '/');
     }
     setSearchQuery('');
+    setSelectedLeague(null);
     fetchSchedule();
   }
 
@@ -204,11 +216,14 @@ const App: React.FC = () => {
     }, 3000);
   };
 
-  const filteredMatches = schedule.filter(match =>
-    (match.team1?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (match.team2?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (match.league || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMatches = schedule
+    .filter(match => !selectedLeague || (match.league || '').toLowerCase() === selectedLeague.toLowerCase())
+    .filter(match => {
+        const query = searchQuery.toLowerCase();
+        return (match.team1?.name || '').toLowerCase().includes(query) ||
+            (match.team2?.name || '').toLowerCase().includes(query) ||
+            (match.league || '').toLowerCase().includes(query)
+    });
 
   const renderContent = () => {
     if (loading) {
@@ -242,7 +257,7 @@ const App: React.FC = () => {
 
     return (
       <>
-        <div className="mb-8 relative">
+        <div className="mb-6 relative">
           <input
             type="text"
             placeholder="Search for team, league..."
@@ -267,6 +282,11 @@ const App: React.FC = () => {
             </div>
           )}
         </div>
+        <LeagueFilter
+            leagues={POPULAR_LEAGUES}
+            selectedLeague={selectedLeague}
+            onSelect={setSelectedLeague}
+        />
         <ScheduleList matches={filteredMatches} onSelectMatch={handleSelectMatch} />
       </>
     );
