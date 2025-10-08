@@ -65,16 +65,6 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
         )}
         <p className="text-sm text-center text-secondary mt-1 truncate">{match.league || 'Unknown League'}</p>
       </div>
-
-      {/* Action Icons Column */}
-      <div className="w-16 flex items-center justify-end shrink-0 text-secondary">
-          <div className="group-hover:text-primary transition-colors duration-300 ml-1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform transition-transform duration-300 group-hover:translate-x-1">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </div>
-      </div>
     </div>
   );
 };
