@@ -11,6 +11,12 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
   const status = getMatchStatus(match);
   const isLive = status === 'live';
 
+  // Check if the 'live' status comes from manual data entry.
+  const isManuallyLive = isLive && (
+      ['live', 'Live', 'LIVE'].includes(match.kickoff_time) ||
+      ['live', 'Live', 'LIVE'].includes(match.match_time)
+  );
+
   let formattedTime = 'TBD';
   let formattedDate = '';
 
@@ -33,20 +39,30 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ match, onSelect }) => {
       onKeyPress={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect(match)}
     >
       {/* Time/Status Column */}
-      <div className="flex flex-col items-center justify-center w-20 md:w-24 text-center shrink-0">
-        {isLive ? (
-            <div className="flex items-center gap-2 px-3 py-1 font-semibold text-accent2 bg-accent2/10 rounded-full">
-              <span className="relative flex h-2 w-2">
+      <div className="flex flex-col items-center justify-center w-20 md:w-24 text-center shrink-0 h-14">
+        {isManuallyLive ? (
+            <div className="flex items-center gap-2 px-3 py-1 text-sm font-semibold text-accent2 bg-accent2/10 rounded-full">
+              <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent2 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent2"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent2"></span>
               </span>
-              <span className="text-sm">LIVE</span>
+              <span>LIVE</span>
             </div>
         ) : (
-          <>
-            <p className="text-lg md:text-xl font-semibold text-primary">{formattedTime}</p>
-            <p className="text-xs text-secondary uppercase tracking-wider">{formattedDate}</p>
-          </>
+            <>
+                <p className="text-lg md:text-xl font-semibold text-primary">{formattedTime}</p>
+                {isLive ? (
+                    <div className="flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold text-accent2 bg-accent2/10 rounded-full">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent2 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-accent2"></span>
+                      </span>
+                      <span>LIVE</span>
+                    </div>
+                ) : (
+                    <p className="text-xs text-secondary uppercase tracking-wider">{formattedDate}</p>
+                )}
+            </>
         )}
       </div>
       
