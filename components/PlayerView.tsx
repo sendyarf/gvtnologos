@@ -3,12 +3,14 @@ import type { Match } from '../types';
 import { getMatchStatus, getMatchStartDate } from '../utils/date';
 import CountdownTimer from './CountdownTimer';
 import { copyMatchUrl } from '../utils/share';
+import AdBlockNotification from './AdBlockNotification';
 
 interface PlayerViewProps {
   match: Match;
   onBack: () => void;
   onRefresh: () => void;
   onShareSuccess: () => void;
+  isAdBlockerActive: boolean;
 }
 
 const BackArrowIcon = ({ className }: { className?: string }) => (
@@ -37,7 +39,7 @@ const RefreshIcon = () => (
 );
 
 
-const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onShareSuccess }) => {
+const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onShareSuccess, isAdBlockerActive }) => {
   const [currentServerUrl, setCurrentServerUrl] = useState<string>(match.servers[0]?.url || '');
   const [refreshKey, setRefreshKey] = useState(0);
   
@@ -58,6 +60,49 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
   };
 
   if (!match) return null;
+
+  const renderPlayerContent = () => {
+    if (isAdBlockerActive) {
+      return <AdBlockNotification />;
+    }
+    
+    if (isLive) {
+      return currentServerUrl ? (
+        <iframe
+            key={`${currentServerUrl}-${refreshKey}`}
+            src={currentServerUrl}
+            title="Live Stream Player"
+            className="w-full h-full"
+            allow="encrypted-media; autoplay; fullscreen"
+            allowFullScreen
+            scrolling="no"
+        ></iframe>
+      ) : (
+        <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
+            <p className="text-primary font-semibold text-lg">Select a Stream</p>
+            <p className="text-secondary text-sm mt-1">Choose an available stream from the list to start watching.</p>
+        </div>
+      );
+    }
+    
+    if (isUpcoming) {
+      return matchDate ? (
+        <CountdownTimer targetDate={matchDate} onCountdownFinish={onRefresh} />
+      ) : (
+        <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
+            <p className="text-secondary font-semibold">Match time is not available.</p>
+        </div>
+      );
+    }
+
+    // Past status
+    return (
+      <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
+        <h3 className="text-2xl font-bold text-primary mb-2">Match Has Finished</h3>
+        <p className="text-secondary">This match is no longer available to watch.</p>
+      </div>
+    );
+  };
 
   return (
     <div className="animate-fade-in-up max-w-7xl mx-auto">
@@ -98,37 +143,7 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
 
             {/* Video Player or Countdown */}
             <div className="aspect-video bg-black">
-              {isLive ? (
-                currentServerUrl ? (
-                <iframe
-                    key={`${currentServerUrl}-${refreshKey}`}
-                    src={currentServerUrl}
-                    title="Live Stream Player"
-                    className="w-full h-full"
-                    allow="encrypted-media; autoplay; fullscreen"
-                    allowFullScreen
-                    scrolling="no"
-                ></iframe>
-                ) : (
-                <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
-                    <p className="text-primary font-semibold text-lg">Select a Stream</p>
-                    <p className="text-secondary text-sm mt-1">Choose an available stream from the list to start watching.</p>
-                </div>
-                )
-              ) : isUpcoming ? (
-                matchDate ? (
-                  <CountdownTimer targetDate={matchDate} onCountdownFinish={onRefresh} />
-                ) : (
-                  <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
-                      <p className="text-secondary font-semibold">Match time is not available.</p>
-                  </div>
-                )
-              ) : ( // Past status
-                <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
-                  <h3 className="text-2xl font-bold text-primary mb-2">Match Has Finished</h3>
-                  <p className="text-secondary">This match is no longer available to watch.</p>
-                </div>
-              )}
+              {renderPlayerContent()}
             </div>
 
             {/* Action Bar */}
@@ -147,7 +162,7 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
                 </div>
 
                 <div className="flex items-center gap-2">
-                    {isLive && currentServerUrl && (
+                    {isLive && currentServerUrl && !isAdBlockerActive && (
                         <button 
                             onClick={handleRefreshStream}
                             aria-label="Refresh Stream"

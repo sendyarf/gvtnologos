@@ -1,44 +1,46 @@
 import React from 'react';
 
-const ShieldIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-amber-400">
+const ShieldAlertIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 mb-4">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        <path d="M12 8v4"></path>
+        <path d="M12 16h.01"></path>
     </svg>
 );
 
-const CloseIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+const RefreshIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+        <path d="M21 21v-5h-5"/>
     </svg>
 );
 
-interface AdBlockNotificationProps {
-  onClose: () => void;
-}
 
-const AdBlockNotification: React.FC<AdBlockNotificationProps> = ({ onClose }) => {
+const AdBlockNotification: React.FC = () => {
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   return (
     <div 
-        className="fixed bottom-0 inset-x-0 bg-amber-500/10 backdrop-blur-md border-t border-amber-500/30 z-[60] animate-fade-in-up"
+        className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-6 border border-dashed border-amber-500/40"
         role="alert"
         aria-live="assertive"
     >
-        <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <ShieldIcon />
-            <div className="flex-grow">
-                <h3 className="font-bold text-amber-300">Ad Blocker Detected</h3>
-                <p className="text-sm text-amber-300/80 mt-1">
-                    Please consider disabling your ad blocker on this site. Ads help us keep the servers running and provide free streams.
-                </p>
-            </div>
-            <button
-                onClick={onClose}
-                className="p-2 text-amber-300/70 hover:text-amber-300 hover:bg-white/10 rounded-full transition-colors shrink-0 absolute top-3 right-3 sm:static"
-                aria-label="Dismiss notification"
-            >
-                <CloseIcon />
-            </button>
-        </div>
+        <ShieldAlertIcon />
+        <h3 className="text-xl font-bold text-amber-300">Please Disable Your Ad Blocker</h3>
+        <p className="text-sm text-amber-300/80 mt-2 max-w-md">
+            Ads help us keep the servers running. To watch the stream, please disable your ad blocker for this site and then refresh the page.
+        </p>
+        <button
+            onClick={handleRefresh}
+            className="mt-6 flex items-center gap-2 px-5 py-2.5 bg-amber-400/10 text-amber-300 border border-amber-400/30 rounded-lg font-semibold hover:bg-amber-400 hover:text-background transition-all duration-300"
+        >
+            <RefreshIcon />
+            Refresh Page
+        </button>
     </div>
   );
 };

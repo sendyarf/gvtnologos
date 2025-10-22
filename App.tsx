@@ -287,7 +287,13 @@ const App: React.FC = () => {
     
     if (selectedMatch) {
       return (
-        <PlayerView match={selectedMatch} onBack={handleBackToSchedule} onRefresh={fetchSchedule} onShareSuccess={handleShareSuccess} />
+        <PlayerView 
+          match={selectedMatch} 
+          onBack={handleBackToSchedule} 
+          onRefresh={fetchSchedule} 
+          onShareSuccess={handleShareSuccess}
+          isAdBlockerActive={showAdBlockNotification}
+        />
       );
     }
 
@@ -367,7 +373,6 @@ const App: React.FC = () => {
       {isUpdateAvailable && <UpdateNotification onUpdate={triggerUpdate} onDismiss={dismissUpdate} />}
       {isScrollButtonVisible && <ScrollToTopButton onClick={scrollToTop} />}
       {showCopyToast && <ShareToast />}
-      {showAdBlockNotification && <AdBlockNotification onClose={() => setShowAdBlockNotification(false)} />}
     </div>
   );
 };
