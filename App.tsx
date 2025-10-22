@@ -10,6 +10,7 @@ import { getMatchStatus } from './utils/date';
 import ShareToast from './components/ShareToast';
 import LeagueFilter from './components/LeagueFilter';
 import AdBlockNotification from './components/AdBlockNotification';
+import PinnedMatches from './components/PinnedMatches';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 
@@ -49,8 +50,36 @@ const App: React.FC = () => {
   const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [showAdBlockNotification, setShowAdBlockNotification] = useState(false);
+  const [pinnedMatchIds, setPinnedMatchIds] = useState<string[]>([]);
   const initialUrlChecked = useRef(false);
   
+  // Load pinned matches from localStorage on initial render
+  useEffect(() => {
+    try {
+      const storedPins = localStorage.getItem('pinnedMatches');
+      if (storedPins) {
+        setPinnedMatchIds(JSON.parse(storedPins));
+      }
+    } catch (error) {
+      console.error("Failed to parse pinned matches from localStorage", error);
+    }
+  }, []);
+
+  const togglePinMatch = (matchId: string) => {
+    setPinnedMatchIds(prevPins => {
+      const newPins = prevPins.includes(matchId)
+        ? prevPins.filter(id => id !== matchId)
+        : [...prevPins, matchId];
+      
+      try {
+        localStorage.setItem('pinnedMatches', JSON.stringify(newPins));
+      } catch (error) {
+        console.error("Failed to save pinned matches to localStorage", error);
+      }
+      
+      return newPins;
+    });
+  };
 
   const fetchSchedule = useCallback(async () => {
     // Only show initial loading spinner, not for background refreshes
@@ -252,7 +281,12 @@ const App: React.FC = () => {
     }, 3000);
   };
 
-  const filteredMatches = schedule
+  // Separate pinned matches from the main schedule
+  const pinnedMatches = schedule.filter(match => pinnedMatchIds.includes(match.id));
+  const regularMatches = schedule.filter(match => !pinnedMatchIds.includes(match.id));
+
+  // Apply filters only to regular matches
+  const filteredRegularMatches = regularMatches
     .filter(match => !selectedLeague || (match.league || '').toLowerCase() === selectedLeague.toLowerCase())
     .filter(match => {
         const query = searchQuery.toLowerCase();
@@ -329,7 +363,18 @@ const App: React.FC = () => {
             selectedLeague={selectedLeague}
             onSelect={setSelectedLeague}
         />
-        <ScheduleList matches={filteredMatches} onSelectMatch={handleSelectMatch} />
+        <PinnedMatches 
+            matches={pinnedMatches}
+            onSelectMatch={handleSelectMatch}
+            onTogglePin={togglePinMatch}
+            pinnedMatchIds={pinnedMatchIds}
+        />
+        <ScheduleList 
+            matches={filteredRegularMatches} 
+            onSelectMatch={handleSelectMatch} 
+            pinnedMatchIds={pinnedMatchIds}
+            onTogglePin={togglePinMatch}
+        />
       </>
     );
   };

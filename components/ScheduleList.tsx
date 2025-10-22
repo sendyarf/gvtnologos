@@ -5,6 +5,8 @@ import ScheduleItem from './ScheduleItem';
 interface ScheduleListProps {
   matches: Match[];
   onSelectMatch: (match: Match) => void;
+  pinnedMatchIds: string[];
+  onTogglePin: (matchId: string) => void;
 }
 
 const NoMatchesIcon = () => (
@@ -17,7 +19,7 @@ const NoMatchesIcon = () => (
 );
 
 
-const ScheduleList: React.FC<ScheduleListProps> = ({ matches, onSelectMatch }) => {
+const ScheduleList: React.FC<ScheduleListProps> = ({ matches, onSelectMatch, pinnedMatchIds, onTogglePin }) => {
   if (matches.length === 0) {
     return (
       <div className="text-center py-24 flex flex-col items-center border border-dashed border-border rounded-lg">
@@ -32,7 +34,12 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ matches, onSelectMatch }) =
     <div className="space-y-3">
       {matches.map((match, index) => (
         <div key={match.id} style={{ animationDelay: `${index * 50}ms`}} className="animate-fade-in-up opacity-0">
-          <ScheduleItem match={match} onSelect={onSelectMatch} />
+          <ScheduleItem 
+            match={match} 
+            onSelect={onSelectMatch} 
+            isPinned={pinnedMatchIds.includes(match.id)}
+            onTogglePin={onTogglePin}
+          />
         </div>
       ))}
     </div>
