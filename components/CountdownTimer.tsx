@@ -25,12 +25,59 @@ const calculateTimeLeft = (target: Date): TimeLeft | null => {
   };
 };
 
-const CountdownSegment: React.FC<{ value: number; label: string }> = ({ value, label }) => (
-    <div className="flex flex-col items-center w-20">
-        <span className="text-4xl md:text-5xl font-semibold tracking-tight text-primary tabular-nums">{String(value).padStart(2, '0')}</span>
-        <span className="text-xs md:text-sm font-medium text-secondary uppercase tracking-widest mt-1">{label}</span>
-    </div>
-);
+const CountdownSegment: React.FC<{ value: number; maxValue: number; label: string }> = ({ value, maxValue, label }) => {
+    const size = 100;
+    const strokeWidth = 8;
+    const radius = (size - strokeWidth) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (value / maxValue) * circumference;
+
+    return (
+        <div className="flex flex-col items-center justify-center text-center w-20 h-28 sm:w-28 sm:h-36">
+            <div className="relative w-full h-full flex items-center justify-center">
+                <svg className="absolute w-full h-full" viewBox={`0 0 ${size} ${size}`}>
+                    <defs>
+                        <linearGradient id="countdownGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#8B5CF6" />
+                            <stop offset="100%" stopColor="#3B82F6" />
+                        </linearGradient>
+                    </defs>
+                    <circle
+                        cx={size / 2}
+                        cy={size / 2}
+                        r={radius}
+                        strokeWidth={strokeWidth}
+                        className="stroke-border"
+                        fill="none"
+                    />
+                    <circle
+                        cx={size / 2}
+                        cy={size / 2}
+                        r={radius}
+                        strokeWidth={strokeWidth}
+                        stroke="url(#countdownGradient)"
+                        fill="none"
+                        strokeLinecap="round"
+                        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+                        style={{
+                            strokeDasharray: circumference,
+                            strokeDashoffset: offset,
+                            transition: 'stroke-dashoffset 0.5s linear'
+                        }}
+                    />
+                </svg>
+                <div className="flex flex-col">
+                    <span className="text-3xl sm:text-4xl font-bold text-primary tabular-nums">
+                        {String(value).padStart(2, '0')}
+                    </span>
+                </div>
+            </div>
+             <span className="text-xs sm:text-sm font-medium text-secondary uppercase tracking-widest -mt-4 sm:-mt-6">
+                {label}
+            </span>
+        </div>
+    );
+};
 
 const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, onCountdownFinish }) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(() => calculateTimeLeft(targetDate));
@@ -80,16 +127,13 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, onCountdown
   }
 
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
-        <h3 className="text-lg md:text-xl font-medium text-secondary mb-6 md:mb-8">Countdown to Kick-off</h3>
-        <div className="flex items-start justify-center gap-2 md:gap-4">
-            <CountdownSegment value={timeLeft.days} label="Days" />
-            <span className="text-4xl md:text-5xl font-light text-border -mt-1">:</span>
-            <CountdownSegment value={timeLeft.hours} label="Hours" />
-            <span className="text-4xl md:text-5xl font-light text-border -mt-1">:</span>
-            <CountdownSegment value={timeLeft.minutes} label="Minutes" />
-            <span className="text-4xl md:text-5xl font-light text-border -mt-1">:</span>
-            <CountdownSegment value={timeLeft.seconds} label="Seconds" />
+    <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-2 sm:p-4">
+        <h3 className="text-base sm:text-lg md:text-xl font-medium text-secondary mb-3 sm:mb-4">Countdown to Kick-off</h3>
+        <div className="flex items-start justify-center gap-x-2 sm:gap-x-4 md:gap-x-6 scale-90 sm:scale-100">
+            <CountdownSegment value={timeLeft.days} maxValue={99} label="Days" />
+            <CountdownSegment value={timeLeft.hours} maxValue={24} label="Hours" />
+            <CountdownSegment value={timeLeft.minutes} maxValue={60} label="Minutes" />
+            <CountdownSegment value={timeLeft.seconds} maxValue={60} label="Seconds" />
         </div>
     </div>
   );
