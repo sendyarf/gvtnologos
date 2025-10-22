@@ -71,17 +71,33 @@ const App: React.FC = () => {
           const statusA = getMatchStatus(a);
           const statusB = getMatchStatus(b);
 
+          // 1. Sort by status (live > upcoming)
           if (statusA !== statusB) {
             return statusPriority[statusA] - statusPriority[statusB];
           }
 
-          if (statusA === 'upcoming') {
-            const dateA = new Date(`${a.match_date}T${a.match_time}:00+07:00`);
-            const dateB = new Date(`${b.match_date}T${b.match_time}:00+07:00`);
-            if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
-              return dateA.getTime() - dateB.getTime();
+          // 2. If status is the same, sort by date (both for 'live' and 'upcoming')
+          const getSortableDate = (match: Match) => {
+            // Prioritize match_date/time as it's used for countdown
+            let date = new Date(`${match.match_date}T${match.match_time}:00+07:00`);
+            if (!isNaN(date.getTime())) {
+                return date;
             }
+            // Fallback to kickoff_date/time
+            date = new Date(`${match.kickoff_date}T${match.kickoff_time}:00+07:00`);
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+            return null; // Should not happen with valid data
+          };
+    
+          const dateA = getSortableDate(a);
+          const dateB = getSortableDate(b);
+
+          if (dateA && dateB) {
+              return dateA.getTime() - dateB.getTime();
           }
+
           return 0;
         });
         
