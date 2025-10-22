@@ -72,7 +72,7 @@ const CountdownSegment: React.FC<{ value: number; maxValue: number; label: strin
                     </span>
                 </div>
             </div>
-             <span className="text-xs sm:text-sm font-medium text-secondary uppercase tracking-widest -mt-4 sm:-mt-6">
+             <span className="text-xs sm:text-sm font-medium text-secondary uppercase tracking-widest -mt-2">
                 {label}
             </span>
         </div>
