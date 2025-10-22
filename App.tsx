@@ -9,6 +9,7 @@ import UpdateNotification from './components/UpdateNotification';
 import { getMatchStatus } from './utils/date';
 import ShareToast from './components/ShareToast';
 import LeagueFilter from './components/LeagueFilter';
+import AdBlockNotification from './components/AdBlockNotification';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 
@@ -47,6 +48,7 @@ const App: React.FC = () => {
   const [selectedLeague, setSelectedLeague] = useState<string | null>(null);
   const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
+  const [showAdBlockNotification, setShowAdBlockNotification] = useState(false);
   const initialUrlChecked = useRef(false);
   
 
@@ -149,6 +151,24 @@ const App: React.FC = () => {
         window.removeEventListener('popstate', handlePopState);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Ad Blocker Detection Effect
+  useEffect(() => {
+    const checkAdBlocker = () => {
+        const adContainer = document.getElementById('ad-bait-container');
+        // The ad script should insert an iframe. If it's missing, the script was blocked.
+        if (adContainer && adContainer.querySelector('iframe') === null) {
+            setShowAdBlockNotification(true);
+        }
+    };
+    
+    // Give the external ad script sufficient time to load and execute (or be blocked).
+    const detectionTimeout = setTimeout(checkAdBlocker, 2500);
+
+    return () => {
+        clearTimeout(detectionTimeout);
+    };
   }, []);
 
   // Handle direct URL access
@@ -347,6 +367,7 @@ const App: React.FC = () => {
       {isUpdateAvailable && <UpdateNotification onUpdate={triggerUpdate} onDismiss={dismissUpdate} />}
       {isScrollButtonVisible && <ScrollToTopButton onClick={scrollToTop} />}
       {showCopyToast && <ShareToast />}
+      {showAdBlockNotification && <AdBlockNotification onClose={() => setShowAdBlockNotification(false)} />}
     </div>
   );
 };
