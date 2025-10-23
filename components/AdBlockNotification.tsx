@@ -32,7 +32,7 @@ const AdBlockNotification: React.FC = () => {
         <ShieldAlertIcon />
         <h3 className="text-lg sm:text-xl font-bold text-amber-300">Please Disable Your Ad Blocker</h3>
         <p className="text-sm text-amber-300/80 mt-2">
-            Ads help us keep the servers running. To watch the stream, please disable your ad blocker for this site and then refresh the page.
+            To watch the stream, please disable your ad blocker for this site and then refresh the page.
         </p>
         <button
             onClick={handleRefresh}
