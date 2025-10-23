@@ -25,18 +25,18 @@ const AdBlockNotification: React.FC = () => {
 
   return (
     <div 
-        className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-6 border border-dashed border-amber-500/40"
+        className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4 sm:p-6 border border-dashed border-amber-500/40"
         role="alert"
         aria-live="assertive"
     >
         <ShieldAlertIcon />
-        <h3 className="text-xl font-bold text-amber-300">Please Disable Your Ad Blocker</h3>
-        <p className="text-sm text-amber-300/80 mt-2 max-w-md">
+        <h3 className="text-lg sm:text-xl font-bold text-amber-300">Please Disable Your Ad Blocker</h3>
+        <p className="text-sm text-amber-300/80 mt-2">
             Ads help us keep the servers running. To watch the stream, please disable your ad blocker for this site and then refresh the page.
         </p>
         <button
             onClick={handleRefresh}
-            className="mt-6 flex items-center gap-2 px-5 py-2.5 bg-amber-400/10 text-amber-300 border border-amber-400/30 rounded-lg font-semibold hover:bg-amber-400 hover:text-background transition-all duration-300"
+            className="mt-6 flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-amber-400/10 text-amber-300 border border-amber-400/30 rounded-lg font-semibold hover:bg-amber-400 hover:text-background transition-all duration-300"
         >
             <RefreshIcon />
             Refresh Page
