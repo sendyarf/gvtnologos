@@ -182,22 +182,9 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ad Blocker Detection Effect
+  // Ad Blocker Detection Effect (DISABLED)
   useEffect(() => {
-    const checkAdBlocker = () => {
-        const adContainer = document.getElementById('ad-bait-container');
-        // The ad script should insert an iframe. If it's missing, the script was blocked.
-        if (adContainer && adContainer.querySelector('iframe') === null) {
-            setShowAdBlockNotification(true);
-        }
-    };
-    
-    // Give the external ad script sufficient time to load and execute (or be blocked).
-    const detectionTimeout = setTimeout(checkAdBlocker, 2500);
-
-    return () => {
-        clearTimeout(detectionTimeout);
-    };
+    setShowAdBlockNotification(false);
   }, []);
 
   // Handle direct URL access
