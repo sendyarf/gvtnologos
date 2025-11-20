@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Match } from '../types';
 import { getMatchStatus, getMatchStartDate } from '../utils/date';
 import CountdownTimer from './CountdownTimer';
@@ -12,6 +12,9 @@ interface PlayerViewProps {
   onShareSuccess: () => void;
   isAdBlockerActive: boolean;
 }
+
+const PRIMARY_DOMAIN = 'multi.govoet.my.id';
+const BACKUP_DOMAIN = '01.himawarinovel.my.id';
 
 const BackArrowIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
@@ -38,15 +41,27 @@ const RefreshIcon = () => (
     </svg>
 );
 
+const FixIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+    </svg>
+);
+
 
 const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onShareSuccess, isAdBlockerActive }) => {
   const [currentServerUrl, setCurrentServerUrl] = useState<string>(match.servers[0]?.url || '');
+  const [useBackupDomain, setUseBackupDomain] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   
   const status = getMatchStatus(match);
   const isLive = status === 'live';
   const isUpcoming = status === 'upcoming';
   const matchDate = getMatchStartDate(match);
+
+  // Reset backup domain state when manually changing servers from the list
+  useEffect(() => {
+    setUseBackupDomain(false);
+  }, [currentServerUrl]);
 
   const handleCopyUrl = async () => {
     const copiedToClipboard = await copyMatchUrl(match);
@@ -59,6 +74,22 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
     setRefreshKey(prevKey => prevKey + 1);
   };
 
+  const handleFixStream = () => {
+    setUseBackupDomain(prev => !prev);
+    setRefreshKey(prevKey => prevKey + 1);
+  };
+
+  const getDisplayUrl = (url: string) => {
+    if (useBackupDomain && url.includes(PRIMARY_DOMAIN)) {
+        return url.replace(PRIMARY_DOMAIN, BACKUP_DOMAIN);
+    }
+    // If we toggle back to primary (useBackupDomain is false), 
+    // or if the URL doesn't contain the primary domain, return original.
+    return url;
+  };
+
+  const activeUrl = getDisplayUrl(currentServerUrl);
+
   if (!match) return null;
 
   const renderPlayerContent = () => {
@@ -67,15 +98,19 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
     }
     
     if (isLive) {
-      return currentServerUrl ? (
+      return activeUrl ? (
         <iframe
-            key={`${currentServerUrl}-${refreshKey}`}
-            src={currentServerUrl}
+            key={`${activeUrl}-${refreshKey}`}
+            src={activeUrl}
             title="Live Stream Player"
             className="w-full h-full"
             allow="encrypted-media; autoplay; fullscreen"
             allowFullScreen
             scrolling="no"
+            onError={() => {
+                // Attempt to auto-switch if iframe throws a catchable error (rare for cross-origin)
+                if (!useBackupDomain) handleFixStream();
+            }}
         ></iframe>
       ) : (
         <div className="w-full h-full flex flex-col justify-center items-center bg-surface text-center p-4">
@@ -142,7 +177,7 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
             </div>
 
             {/* Video Player or Countdown */}
-            <div className="aspect-video bg-black">
+            <div className="aspect-video bg-black relative">
               {renderPlayerContent()}
             </div>
 
@@ -163,15 +198,33 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
 
                 <div className="flex items-center gap-2">
                     {isLive && currentServerUrl && !isAdBlockerActive && (
-                        <button 
-                            onClick={handleRefreshStream}
-                            aria-label="Refresh Stream"
-                            title="Refresh Stream"
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold bg-surface hover:bg-surface-hover text-secondary hover:text-primary transition-colors"
-                        >
-                            <RefreshIcon />
-                            <span className="hidden sm:inline">Refresh</span>
-                        </button>
+                        <>
+                            {/* Only show Fix Stream button if the current URL matches the primary domain */}
+                            {currentServerUrl.includes(PRIMARY_DOMAIN) && (
+                                <button 
+                                    onClick={handleFixStream}
+                                    aria-label="Fix Stream"
+                                    title={useBackupDomain ? "Switch back to Primary" : "Switch to Backup Source"}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
+                                        useBackupDomain 
+                                        ? 'bg-warning/10 text-warning border border-warning/30 hover:bg-warning/20' 
+                                        : 'bg-surface hover:bg-surface-hover text-secondary hover:text-primary'
+                                    }`}
+                                >
+                                    <FixIcon />
+                                    <span className="hidden sm:inline">Fix Stream</span>
+                                </button>
+                            )}
+                            <button 
+                                onClick={handleRefreshStream}
+                                aria-label="Refresh Stream"
+                                title="Refresh Stream"
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold bg-surface hover:bg-surface-hover text-secondary hover:text-primary transition-colors"
+                            >
+                                <RefreshIcon />
+                                <span className="hidden sm:inline">Refresh</span>
+                            </button>
+                        </>
                     )}
                     <button 
                         onClick={handleCopyUrl}
