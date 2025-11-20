@@ -12,6 +12,7 @@ import LeagueFilter from './components/LeagueFilter';
 import AdBlockNotification from './components/AdBlockNotification';
 import PinnedMatches from './components/PinnedMatches';
 import VPNNotification from './components/VPNNotification';
+import DevToolsBlocker from './components/DevToolsBlocker';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 
@@ -406,6 +407,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-primary font-sans">
+      <DevToolsBlocker />
       <header className="bg-background/80 backdrop-blur-lg border-b border-border/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-3xl font-extrabold cursor-pointer" onClick={handleLogoClick}>
