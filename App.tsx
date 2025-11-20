@@ -14,6 +14,9 @@ import PinnedMatches from './components/PinnedMatches';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 
+// CONFIGURATION: Set this to 'true' to enable Ad Blocker detection, or 'false' to disable it.
+const ENABLE_AD_BLOCK_DETECTOR = false;
+
 const POPULAR_LEAGUES = [
     'UEFA Champions League',
     'England - Premier League',
@@ -182,9 +185,42 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ad Blocker Detection Effect (DISABLED)
+  // Ad Blocker Detection Effect
   useEffect(() => {
-    setShowAdBlockNotification(false);
+    // If detection is disabled via the constant at the top, exit early.
+    if (!ENABLE_AD_BLOCK_DETECTOR) {
+        setShowAdBlockNotification(false);
+        return;
+    }
+
+    const detectAdBlocker = () => {
+        const bait = document.createElement('div');
+        // Use classes often targeted by ad blockers
+        bait.className = 'adsbox ad-banner google-ad-sense pub_300x250';
+        bait.style.width = '1px';
+        bait.style.height = '1px';
+        bait.style.position = 'absolute';
+        bait.style.left = '-10000px';
+        bait.style.top = '-10000px';
+        document.body.appendChild(bait);
+
+        // Allow browser to render
+        setTimeout(() => {
+            const isBlocked = bait.offsetHeight === 0 || 
+                              window.getComputedStyle(bait).display === 'none';
+            
+            document.body.removeChild(bait);
+            
+            if (isBlocked) {
+                setShowAdBlockNotification(true);
+            }
+        }, 100);
+    };
+
+    // Delay detection slightly to ensure extensions are loaded
+    const timer = setTimeout(detectAdBlocker, 2000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Handle direct URL access
