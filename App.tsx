@@ -11,6 +11,7 @@ import ShareToast from './components/ShareToast';
 import LeagueFilter from './components/LeagueFilter';
 import AdBlockNotification from './components/AdBlockNotification';
 import PinnedMatches from './components/PinnedMatches';
+import VPNNotification from './components/VPNNotification';
 
 const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
 
@@ -53,6 +54,7 @@ const App: React.FC = () => {
   const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [showAdBlockNotification, setShowAdBlockNotification] = useState(false);
+  const [showVPNNotification, setShowVPNNotification] = useState(true);
   const [pinnedMatchIds, setPinnedMatchIds] = useState<string[]>([]);
   const initialUrlChecked = useRef(false);
   
@@ -432,6 +434,9 @@ const App: React.FC = () => {
         </div>
       </header>
       <main className="container mx-auto p-4 md:p-8">
+        {showVPNNotification && (
+            <VPNNotification onClose={() => setShowVPNNotification(false)} />
+        )}
         {renderContent()}
       </main>
       <footer className="text-center py-8 text-secondary/80 text-xs border-t border-border mt-8">
