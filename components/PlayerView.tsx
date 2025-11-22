@@ -268,10 +268,11 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
                         <p className="text-secondary text-sm text-center py-8 px-4">No streams available for this match.</p>
                     )}
                 </div>
+                {/* Promotional Card */}
+              <PromoCard /> 
               </div>
               
-              {/* Promotional Card */}
-              <PromoCard />
+              
             </div>
         )}
 
