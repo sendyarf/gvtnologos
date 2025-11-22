@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import type { Match } from '../types';
 import { getMatchStatus, getMatchStartDate } from '../utils/date';
@@ -244,34 +245,37 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
         {/* Sidebar: Server List & Promo */}
         {isLive && (
             <div className="lg:col-span-1">
-              <div className="bg-surface border border-border rounded-xl lg:sticky lg:top-24">
-                <h3 className="text-lg font-semibold text-primary flex items-center gap-3 p-5 border-b border-border">
-                    <ServersIcon /> 
-                    Available Streams
-                </h3>
-                <div className="flex flex-col space-y-1 p-3">
-                    {match.servers.length > 0 ? (
-                        match.servers.map((server, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentServerUrl(server.url)}
-                                className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-200 text-base
-                                    ${currentServerUrl === server.url
-                                    ? 'bg-gradient-to-r from-accent1 to-accent2 text-white shadow-md shadow-accent1/20'
-                                    : 'bg-transparent hover:bg-surface-hover text-secondary hover:text-primary'
-                                    }`}
-                            >
-                                <span className="truncate">{server.label || `Server ${index + 1}`}</span>
-                            </button>
-                        ))
-                    ) : (
-                        <p className="text-secondary text-sm text-center py-8 px-4">No streams available for this match.</p>
-                    )}
+                {/* Wrapper for sticky positioning of both elements */}
+                <div className="lg:sticky lg:top-24">
+                    <div className="bg-surface border border-border rounded-xl">
+                        <h3 className="text-lg font-semibold text-primary flex items-center gap-3 p-5 border-b border-border">
+                            <ServersIcon /> 
+                            Available Streams
+                        </h3>
+                        <div className="flex flex-col space-y-1 p-3">
+                            {match.servers.length > 0 ? (
+                                match.servers.map((server, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentServerUrl(server.url)}
+                                        className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-200 text-base
+                                            ${currentServerUrl === server.url
+                                            ? 'bg-gradient-to-r from-accent1 to-accent2 text-white shadow-md shadow-accent1/20'
+                                            : 'bg-transparent hover:bg-surface-hover text-secondary hover:text-primary'
+                                            }`}
+                                    >
+                                        <span className="truncate">{server.label || `Server ${index + 1}`}</span>
+                                    </button>
+                                ))
+                            ) : (
+                                <p className="text-secondary text-sm text-center py-8 px-4">No streams available for this match.</p>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Promotional Card */}
+                    <PromoCard />
                 </div>
-              </div>
-               
-              {/* Promotional Card */}
-              <PromoCard />
             </div>
         )}
 
