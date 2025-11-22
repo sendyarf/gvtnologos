@@ -4,6 +4,7 @@ import { getMatchStatus, getMatchStartDate } from '../utils/date';
 import CountdownTimer from './CountdownTimer';
 import { copyMatchUrl } from '../utils/share';
 import AdBlockNotification from './AdBlockNotification';
+import PromoCard from './PromoCard';
 
 interface PlayerViewProps {
   match: Match;
@@ -240,7 +241,7 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
           </div>
         </div>
 
-        {/* Sidebar: Server List */}
+        {/* Sidebar: Server List & Promo */}
         {isLive && (
             <div className="lg:col-span-1">
               <div className="bg-surface border border-border rounded-xl lg:sticky lg:top-24">
@@ -268,6 +269,9 @@ const PlayerView: React.FC<PlayerViewProps> = ({ match, onBack, onRefresh, onSha
                     )}
                 </div>
               </div>
+              
+              {/* Promotional Card */}
+              <PromoCard />
             </div>
         )}
 
