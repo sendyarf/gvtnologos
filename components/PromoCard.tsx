@@ -33,7 +33,7 @@ const PromoCard: React.FC = () => {
                     Himawari Novel
                 </h4>
                 <p className="text-xs text-secondary mt-1 leading-relaxed">
-                    Read the best translated Asian novels for free. Updated daily.
+                    Read translated English novels for free.
                 </p>
             </div>
         </div>
