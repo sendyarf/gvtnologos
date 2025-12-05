@@ -14,7 +14,7 @@ import PinnedMatches from './components/PinnedMatches';
 import VPNNotification from './components/VPNNotification';
 import DevToolsBlocker from './components/DevToolsBlocker';
 
-const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
+const SCHEDULE_URL = 'https://gvtsch.pages.dev/sch.json';
 
 // CONFIGURATION: Set this to 'true' to enable Ad Blocker detection, or 'false' to disable it.
 const ENABLE_AD_BLOCK_DETECTOR = false;
