@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-const SCHEDULE_URL = 'https://weekendsch.pages.dev/sch/schedule.json';
+const SCHEDULE_URL = 'https://gvtsch.pages.dev/sch.json';
 const CHECK_INTERVAL = 60000; // 60 seconds
 
 export const useScheduleUpdater = (onUpdate: () => void) => {
